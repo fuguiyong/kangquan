@@ -67,6 +67,7 @@ class Test1 extends Controller
 
     public function dayTest()
     {
+        echo "hello";
       //  echo phpinfo();
     $list = Ordered::paginate(3);
 
