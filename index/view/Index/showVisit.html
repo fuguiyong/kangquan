@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>康泉综合门诊部</title>
+  <!-- 新 Bootstrap4 核心 CSS 文件 -->
+  <link href="https://cdn.bootcss.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+  <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+  <!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+  <script src="https://cdn.bootcss.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+</head>
+<style media="screen">
+  body {
+    background-color: rgb(242, 242, 242);
+  }
+
+  .box {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+
+  .boxColor {
+    background-color: rgb(191, 217, 244)
+  }
+</style>
+
+<body>
+  {assign name="i" value='1' /}
+  <div class="container">
+<h5 style="margin-top:1em; color:red;">*就诊历史只展示近一年的就诊情况</h5>
+    <div class="row">
+      {volist name="data" id="one"}
+      <div class="card col-11 mx-auto box boxColor" style="margin-top:0.75em;">
+        <div class="card-header text-center">第{$i}条</div>
+        <div class="card-body">
+          <p class="card-text" style="dispaly:inline">就诊老师=><span>{$one.docter}</span></p>
+          <p class="card-text">就诊科室=><span>{$one.department}</span></p>
+          <p class="card-text">就诊时间=><span>{$one.date}</span></p>
+        </div>
+      </div>
+      {/volist}
+    </div>
+  </div>
+
+</body>
+
+</html>

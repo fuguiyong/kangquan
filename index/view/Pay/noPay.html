@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>康泉综合门诊缴费中心</title>
+  <!-- 新 Bootstrap4 核心 CSS 文件 -->
+  <link href="https://cdn.bootcss.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+  <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+  <!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+  <script src="https://cdn.bootcss.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <!-- alert插件 -->
+  <script src="https://cdn.bootcss.com/limonte-sweetalert2/7.21.1/sweetalert2.all.min.js"></script>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="jumbotron">
+      <h3 class="text-center">康泉门诊支付中心</h3>
+    </div>
+    <!-- <h5 class="text-center">该订单已经支付了</h5> -->
+  </div>
+<script>
+  $(function(){
+    swal({
+      title: '支付成功',
+      text: '该订单你已经支付',
+      type:'success',
+      allowOutsideClick:false,
+      confirmButtonText: '确定',
+    }).then(function(){
+      //close windows
+       WeixinJSBridge.call('closeWindow');
+    }).catch(swal.noop);
+
+  });
+</script>
+</body>
+
+</html>

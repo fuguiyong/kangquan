@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js">
+  </script>
+</head>
+
+<body>
+  <h1>jsApiTest</h1>
+  <button>BUTTON1</button>
+  <p>{$jsticket.appId}</p>
+  <p>{$jsticket.timestamp} </p>
+  <p>{$jsticket.nonceStr} </p>
+  <P>{$jsticket.signature}</P>
+  <P>{$jsticket.jsapi_ticket}</P>
+  <script>
+    wx.config({
+      debug: false,
+      appId: "{$jsticket.appId}",
+      timestamp:"{$jsticket.timestamp}",
+      nonceStr: "{$jsticket.nonceStr}",
+      signature: "{$jsticket.signature}",
+      jsApiList: [
+        'checkJsApi',
+        'onMenuShareTimeline',
+        'onMenuShareAppMessage',
+        'onMenuShareQQ',
+        'onMenuShareWeibo',
+        'chooseWXPay',
+      ],
+    });
+    //配置成功
+    wx.ready(function() {
+      alert("配置成功");
+    });
+    //配置失败
+    wx.error(function(res) {
+      alert(res.errMsg); //输入配置错误信息
+    });
+    //检查是否支持接口
+    wx.checkJsApi({
+    jsApiList: ['chooseWXPay'], // 需要检测的JS接口列表，所有JS接口列表见附录2,
+    success: function(res) {
+  },
+  fail:function(res){
+    alert(res.errMsg);
+  }
+});
+  </script>
+</body>
+
+</html>

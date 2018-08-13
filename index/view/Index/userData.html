@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>康泉综合门诊部</title>
+  <!-- 新 Bootstrap4 核心 CSS 文件 -->
+  <link href="https://cdn.bootcss.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+  <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+  <!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+  <script src="https://cdn.bootcss.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<style>
+  .font {
+    font-size: 1.2em;
+  }
+  body{
+    background-color: rgb(242, 242, 242);
+  }
+</style>
+
+<body>
+  <div class="container-fluid border" style="background-color:white;">
+    <div class="row">
+      <div class="col-4 col-md-2 mx-auto">
+        <img class="card-img-top " style="border-radius:50%;" src="{$data.headimgUrl}" alt="Card image">
+      </div>
+    </div>
+    <div class="row ">
+      <div class="col-5 mx-auto ">
+        <h5 class="text-center" style="font-size:0.95em;margin-top: 0.5em;color:rgba(17, 17, 17, 0.87)">{$data.name}</h5>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="container-fluids">
+    <div class="list-group">
+      <a href="{:url('index/index/showOrdered')}" class="list-group-item list-group-item-action font"><span class="glyphicon glyphicon-list" style="color: rgb(244, 122, 60); font-size: 22px;margin-left:0.2em;margin-right:0.9em;"></span>我的预约<span class="glyphicon glyphicon-chevron-right float-right"></span></a>
+      <a href="{:url('index/index/showVisit')}" class="list-group-item list-group-item-action font"><span class="glyphicon glyphicon-calendar" style="color: rgb(103, 181, 214); font-size: 22px;margin-left:0.2em;margin-right:0.9em;"></span>就诊历史<span class="glyphicon glyphicon-chevron-right float-right"></span></a>
+      <a href="{:url('index/index/updateData')}" class="list-group-item list-group-item-action font"><span class="glyphicon glyphicon-edit" style="color: rgb(25, 99, 175); font-size: 22px;margin-left:0.2em;margin-right:0.9em;"></span>信息修改<span class="glyphicon glyphicon-chevron-right float-right"></span></a>
+      <a id="cancelData" class="list-group-item list-group-item-action font"><span class="glyphicon glyphicon-collapse-down" style="color: rgb(221, 219, 33); font-size: 22px;margin-left:0.2em;margin-right:0.9em;"></span>注销信息<span class="glyphicon glyphicon-chevron-right float-right"></span></a>
+    </div>
+  </div>
+
+  <!-- js -->
+  <!-- alert 插件 -->
+  <script src="https://cdn.bootcss.com/limonte-sweetalert2/7.21.1/sweetalert2.all.min.js"></script>
+  <script>
+    $(function() {
+      //注销事件
+      $("#cancelData").click(function() {
+        swal({
+          title: '确定注销信息吗？',
+          text: '取消绑定后，没法在公众号缴费与预约挂号。',
+          type: 'warning',
+          showCancelButton: true,
+          showLoaderOnConfirm: true,
+          allowOutsideClick: false,
+          cancelButtonText: '取消',
+          confirmButtonText: '确定',
+        }).then(function(isConfirm) {
+          //只有点击确认才提交数据
+          if (isConfirm.value === true) {
+            //提交数据
+            $.ajax({
+              url: "{:url('index/index/cancelData')}",
+              type: "post",
+              data: {},
+              dataType: "json",
+              success: cancelSuccess,
+              error: cancelError
+            });
+
+          }
+
+        }).catch(swal.noop);
+      });
+
+      //成功函数
+      function cancelSuccess(data) {
+        var errcode = data.errcode;
+        var errmsg = data.errmsg;
+
+        if (errcode == '0') {
+          swal({
+            title: '注销成功',
+            text: errmsg,
+            type: 'success',
+            allowOutsideClick: false,
+            confirmButtonText: '确定',
+          }).then(function() {
+            //close windows
+            WeixinJSBridge.call('closeWindow');
+          });
+        } else {
+          swal('注销失败', errmsg, 'error').catch(swal.noop);
+        }
+      }
+
+      //失败函数
+      function cancelError() {
+          swal('注销失败', '数据提交失败，请你重试 ', 'error').catch(swal.noop);
+      }
+
+    }); //jq end
+  </script>
+</body>
+
+</html>

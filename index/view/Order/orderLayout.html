@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>康泉综合门诊部挂号中心</title>
+  <!-- 新 Bootstrap4 核心 CSS 文件 -->
+  <link href="https://cdn.bootcss.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+  <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+  <!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+  <script src="https://cdn.bootcss.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <!-- alert 插件 -->
+  <script src="https://cdn.bootcss.com/limonte-sweetalert2/7.21.1/sweetalert2.all.min.js"></script>
+  <style>
+    ul {
+      list-style-type: none;
+    }
+
+    li {
+      display: inline-block;
+    }
+
+    li {
+      margin: 10px 0;
+    }
+
+    input.labelauty+label {
+      font: 12px "Microsoft Yahei";
+    }
+
+    input[type=radio] {
+
+      display: inline-block;
+
+      vertical-align: middle;
+
+      width: 20px;
+
+      height: 20px;
+
+      -webkit-appearance: none;
+
+      background-color: transparent;
+
+      border: 0;
+
+      outline: 0 !important;
+
+      line-height: 20px;
+
+      color: #d8d8d8;
+
+    }
+
+    input[type=radio]:after {
+
+      content: "";
+
+      display: block;
+
+      width: 20px;
+
+      height: 20px;
+
+      border-radius: 50%;
+
+      text-align: center;
+
+      line-height: 14px;
+
+      font-size: 16px;
+
+      color: #fff;
+
+      border: 3px solid #ddd;
+
+      background-color: #fff;
+
+      box-sizing: border-box;
+
+    }
+
+    input[type=radio]:checked:after {
+
+      content: "L";
+
+      transform: matrix(-0.766044, -0.642788, -0.642788, 0.766044, 0, 0);
+
+      -webkit-transform: matrix(-0.766044, -0.642788, -0.642788, 0.766044, 0, 0);
+
+      border-color: #099414;
+
+      background-color: #099414;
+
+    }
+    body{
+      background-color: rgb(242, 242, 242);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container-fluid border" style="background-color:white;">
+    <div class="row">
+      <div class="col-4 col-md-2 mx-auto">
+        <img class="card-img-top " style="border-radius:50%;" src="{$data.headimgUrl}" alt="Card image">
+      </div>
+    </div>
+    <div class="row ">
+      <div class="col-5 mx-auto ">
+        <h5 class="text-center" style="font-size:0.9em; padding-left: 0; margin-left:1.5em;margin-top: 0.5em;color:rgba(66, 76, 144, 0.87)">{$data.name}<small style="font-size:0.6em; color:rgb(163, 158, 159);margin-left:0.2em;">{$data.Department}</small></h5>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="container">
+    <p style="color:rgb(102, 100, 101)">选择你的预约时间=><span id="date"></span></p>
+  </div>
+  <!-- Nav tabs -->
+
+  <ul id="dateNav" class="nav nav-pills nav-justified border" role="tablist" style="background-color:white;">
+    <li class="nav-item">
+      <a id="a_day1" class="nav-link active" data-toggle="pill" style="border-radius:50%;" href="">{$data.day1}</a>
+    </li>
+    <li class="nav-item">
+      <a id="a_day2" class="nav-link" data-toggle="pill" href="" style="border-radius:50%;">{$data.day2}</a>
+    </li>
+    <li class="nav-item">
+      <a id="a_day3" class="nav-link" data-toggle="pill" href="" style="border-radius:50%;">{$data.day3}</a>
+    </li>
+    <li class="nav-item">
+      <a id="a_day4" class="nav-link" data-toggle="pill" href="" style="border-radius:50%;">{$data.day4}</a>
+    </li>
+    <li class="nav-item">
+      <a id="a_day5" class="nav-link" data-toggle="pill" href="" style="border-radius:50%;">{$data.day5}</a>
+    </li>
+    <li class="nav-item">
+      <a id="a_day6" class="nav-link" data-toggle="pill" href="" style="border-radius:50%;">{$data.day6}</a>
+    </li>
+    <li class="nav-item">
+      <a id="a_day7" class="nav-link" data-toggle="pill" href="" style="border-radius:50%;">{$data.day7}</a>
+    </li>
+  </ul>
+
+  <div class="container">
+    <!-- 日期选择表单 -->
+    <div class="row" style="margin-top:0.5em;">
+      <div class="col-11 mx-auto border border-info rounded" style="padding-top:0.5em;">
+        <!-- dayForm 动态生成-->
+        <form id="orderForm"></form>
+      </div>
+
+    </div>
+    <p style="color:rgb(102, 100, 101);margin-left:0;">*友情提示：预约人数满了的时间段没有显示</p>
+  </div>
+
+  <!-- 底部预约按钮 -->
+
+  <button type="button" id="submitBtn" class="btn btn-lg btn-block btn-primary fixed-bottom">预约</button>
+
+
+  <script>
+    $(function() {
+      //-------------main start----------
+      //显示日期
+      var date = showDate();
+      $("#date").text(date);
+
+      //医生当天的排班ajax
+      $.ajax({
+        url: "{:url('index/Order/formNav')}",
+        type: "post",
+        data: {
+          docter_id: "{$data.docter_id}",
+          day: "{$data.day1}"
+        },
+        dataType: "json",
+        success: day1Success,
+        error: day1Error
+      });
+
+      //日期链接的ajax
+      $("#dateNav").find("a").click(function() {
+        //获取日期
+        var needDay = $(this).text();
+        //判断日期是否需要修改
+        var dd = new Date();
+        var y = dd.getFullYear();
+        var m = dd.getMonth() + 1; //获取下月份的日期
+        var d = dd.getDate();
+        if(needDay<d){
+          $("#date").text(y+"-"+(m+1)+"-");
+        }else{
+          $("#date").text(y+"-"+m+"-");
+        }
+
+        //添加ajax
+        $.ajax({
+          url: "{:url('index/Order/formNav')}",
+          type: "post",
+          data: {
+            docter_id: "{$data.docter_id}",
+            day: needDay
+          },
+          dataType: "json",
+          success: day1Success,
+          error: day1Error
+        });
+      });
+
+      //提交表单数据
+      $("#submitBtn").click(function() {
+        var time = $("input[name='orderTime']:checked").val(); //获取选中项的值
+        var day = $("li a.active").text(); //获取日期
+
+        //判断是否选取时间
+        if (time == null) {
+          swal("请选择预约时间","", "error").catch(swal.noop);
+        } else {
+          //向用户确认数据
+           var date = getDate(day);
+           var name = "{$data.name}";
+           var data = '预约老师：' + name + '<br />' + '日期：' + date + '<br />' + '时间：' + time;
+
+           swal({
+             title: '确定预约信息',
+             html: data,
+             showCancelButton: true,
+             showLoaderOnConfirm:true,
+             allowOutsideClick:false,
+             cancelButtonText: '取消',
+             confirmButtonText: '确定',
+           }).then(function(isConfirm){
+             //只有点击确认才提交数据
+             if(isConfirm.value===true){
+               //提交数据
+               $.ajax({
+                 url: "{:url('index/Order/startOrder')}",
+                 type: "post",
+                 data: {
+                   docter_id: "{$data.docter_id}",
+                   day: day,
+                   time: time
+                 },
+                 dataType: "json",
+                 success: submitSuccess,
+                 error: submitError
+               });
+
+             }
+
+           }).catch(swal.noop);
+
+        }
+
+      });
+
+      //------------main end------------
+
+      //显示日期函数
+      function showDate() {
+        var dd = new Date();
+        var year = dd.getFullYear();
+        var month = dd.getMonth() + 1;
+        return year + "-" + month + "-";
+      }
+
+      //获取日期函数
+      function getDate(day) {
+
+        var dd = new Date();
+
+        var year = dd.getFullYear();
+        var month = dd.getMonth() + 1;
+        var allDays = new Date(year, month, 0);
+        var nowDay = dd.getDate();
+        var moreDays = day >= nowDay ? day - nowDay : allDays - nowDay + day;
+
+        dd.setDate(dd.getDate() + moreDays); //获取AddDayCount天后的日期
+        var y = dd.getFullYear();
+        var m = dd.getMonth() + 1; //获取当前月份的日期
+        var d = dd.getDate();
+        return y + "-" + m + "-" + d;
+      }
+
+      function getDate1(day) {
+
+        var dd = new Date();
+
+        var year = dd.getFullYear();
+        var month = dd.getMonth() + 1;
+        var allDays = new Date(year, month, 0);
+        var nowDay = dd.getDate();
+        var moreDays = day >= nowDay ? day - nowDay : allDays - nowDay + day;
+
+        dd.setDate(dd.getDate() + moreDays); //获取AddDayCount天后的日期
+        var y = dd.getFullYear();
+        var m = dd.getMonth() + 1; //获取当前月份的日期
+        var d = dd.getDate();
+        return y + "-" + m + "-";
+      }
+
+      //提交成功函数
+      function submitSuccess(data) {
+
+        //获取错误代码
+        var errcode = data.errcode;
+        var errmsg = data.errmsg;
+        //输出信息
+        if(errcode==0){
+          swal({
+            title:"预约成功",
+            text:errmsg,
+            type:"success",
+            allowOutsideClick:false,
+            confirmButtonText:"确认",
+          }).then(function(){
+              WeixinJSBridge.call('closeWindow');
+          }).catch(swal.noop);
+        }else{
+          swal({
+            title:"预约失败",
+            text:errmsg,
+            type:"error",
+            allowOutsideClick:false,
+            confirmButtonText:"取消",
+          }).catch(swal.noop);
+        }
+      }
+
+      //提交失败函数
+      function submitError(XMLHttpRequest, textStatus) {
+        console.log(XMLHttpRequest.status);
+        // 状态
+        console.log(XMLHttpRequest.readyState);
+        // 错误信息
+        console.log(textStatus);
+        swal("", "数据提交失败，请你重试", "error");
+      }
+      //ajax success function
+      function day1Success(data) {
+        //获取数据
+        var is_scheduling = data.is_scheduling;
+
+        //先判断是否排班
+        if (is_scheduling == 0) {
+          var text1 = "<p>该医生今天没有排班，请选择其他时间预约。</p>";
+          $("#orderForm").find("*").remove();
+          $("#orderForm").append(text1);
+        } else {
+
+          var inputsArr = data.inputs;
+          //判断是否有时间可以预约
+          if (inputsArr == null) {
+            var text1 = "<p>该医生今天已经没有时间可以预约了，请选择其他时间预约。</p>";
+            $("#orderForm").find("*").remove();
+            $("#orderForm").append(text1);
+          } else {
+            //初始化表单
+            $("#orderForm").find("*").remove();
+            //写入表单
+            var j = 0;
+            for (var i in inputsArr) {
+              //添加标签
+              var inputText = "<input id=" + i + " type='radio' value=" + inputsArr[i] + " name='orderTime'>";
+              if (j % 4 == 0) {
+                var labelText = "<label for=" + i + " style='margin-left:0.5em;color:rgb(102, 100, 101)'>" + inputText + inputsArr[i] + " </label>";
+              } else {
+                var labelText = "<label for=" + i + " style='margin-left:0.8em;color:rgb(102, 100, 101)'>" + inputText + inputsArr[i] + " </label>";
+              }
+              $("#orderForm").append(labelText);
+              j = j + 1;
+            }
+
+          }
+
+        }
+
+      } //success function end
+
+      function day1Error(XMLHttpRequest, textStatus) {
+        console.log(XMLHttpRequest.status);
+        // 状态
+        console.log(XMLHttpRequest.readyState);
+        // 错误信息
+        console.log(textStatus);
+        swal("", "数据提交失败，请你重试", "error").catch(swal.noop);
+      }
+
+    }); //jq end
+  </script>
+</body>
+
+</html>

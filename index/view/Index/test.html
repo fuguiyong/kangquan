@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>康泉综合门诊部</title>
+    <!-- 新 Bootstrap4 核心 CSS 文件 -->
+    <link href="https://cdn.bootcss.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+    <script src="https://cdn.bootcss.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+</head>
+<style>
+    /*分页*/
+    .pagination {
+    }
+
+    .pagination li {
+        display: inline-block;
+        margin-right: -1px;
+        padding: 5px;
+        border: 1px solid #e2e2e2;
+        min-width: 20px;
+        text-align: center;
+    }
+
+    .pagination li.active {
+        background: #009688;
+        color: #fff;
+        border: 1px solid #009688;
+    }
+
+</style>
+<body>
+
+<h2>用户列表（{$list->total()}）</h2><br>
+{volist name="list" id="user"}
+ID：{$user.docter}<br/>
+昵称：{$user.department}<br/>
+邮箱：{$user.date}<br/>
+------------------------<br/>
+{/volist}
+<br>
+<div id="bb">{$list->render()}</div>
+
+
+<script>
+    $(function(){
+        $("#bb a").addClass('btn  btn-xs');
+        $("#bb span").addClass('btn  btn-xs');
+    });
+</script>
+</body>
+
+</html>

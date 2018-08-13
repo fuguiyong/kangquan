@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>康泉综合门诊</title>
+  <!-- 新 Bootstrap4 核心 CSS 文件 -->
+  <link href="https://cdn.bootcss.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+  <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+  <!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+  <script src="https://cdn.bootcss.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <!-- cookie -->
+  <script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+  <!-- form -->
+  <script src="https://cdn.bootcss.com/jquery.form/4.2.1/jquery.form.min.js"></script>
+  <!-- 验证插件 -->
+  <script src="https://cdn.bootcss.com/jquery-validate/1.17.0/additional-methods.min.js"></script>
+  <script src="https://cdn.bootcss.com/jquery-validate/1.17.0/jquery.validate.min.js"></script>
+  <script src="https://cdn.bootcss.com/jquery-validate/1.17.0/localization/messages_zh.min.js"></script>
+</head>
+<style>
+</style>
+
+<body>
+  <div class="container">
+    <div class="row">
+        {volist name="data1" id="drug1"}
+      <div class="col-6 col-sm-3" style="padding:0.1em">
+
+        <div class="card" style="margin-bottom:0.5em;">
+          <img class="card-img-top" src="{$drug1.imgurl}" alt="Card image">
+          <div class="">
+            <p class="card-text" style="font-size:0.875em;">{$drug1.describ} <br>
+              <sapn style="color:red;">￥{$drug1.price}</sapn>
+            </p>
+          </div>
+        </div>
+
+
+      </div>
+      {/volist}
+    </div>
+  </div>
+</body>
+
+</html>

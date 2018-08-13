@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>康泉综合门诊绑定中心</title>
+    <!-- 新 Bootstrap4 核心 CSS 文件 -->
+    <link href="https://cdn.bootcss.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+    <script src="https://cdn.bootcss.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <!-- cookie -->
+    <script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+</head>
+<style>
+    .input-lg {
+
+        height: 57px;
+
+        padding: 10px 16px;
+
+        font-size: 18px;
+
+        line-height: 1.3333333;
+
+    }
+
+    .btnColor {
+        background-color: #2EBBF2;
+    }
+
+    body {
+        background-color: rgb(242, 242, 242);
+    }
+
+    input.error {
+        border: 1px solid red;
+    }
+
+    label.error {
+
+        padding-left: 16px;
+
+        padding-bottom: 2px;
+
+        font-weight: bold;
+
+        color: #EA5200;
+    }
+</style>
+
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-11 mx-auto rounded"
+             style="background-color:white;margin-top:2em;box-shadow: 0 0 8px rgba(0, 0, 0, 0.4)">
+            <!-- 标题 -->
+            <br>
+            <h2 class="text-center">微信绑定</h2>
+            <br>
+            <!-- 表单 -->
+            <form action="" id="orderForm">
+                {:token()}
+                <div class="form-group">
+                    <input style="background:transparent;" type="text" name="tel" id="tel"
+                           class="border-top-0 border-left-0 border-right-0  form-control input-lg"
+                           placeholder="在康泉门诊个人档案的手机号">
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-7">
+                            <input style="background:transparent;" type="text" name="validText" id="validText"
+                                   class="border-top-0 border-left-0 border-right-0  form-control input-lg"
+                                   placeholder="验证码">
+                        </div>
+                        <div class="col-5">
+                            <button type="button" id="validBtn" class=" btn btn-block btn-primary input-lg "
+                                    disabled="disabled">获取
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <!-- submtiBtn -->
+                <button type="submit" id="submitBtn" class="btn btn-primary btn-block input-lg ">绑定</button>
+                <br><br>
+            </form>
+        </div>
+        <br>
+        <div class="col-11 mx-auto rounded">
+            <br>
+            <p><span style="color: red;">*</span>请先确定你在康泉门诊已经有个人档案才可以与微信公众号绑定，否则请 <a
+                    href="http://www.kangquanpay.top/register">
+                注册</a></p>
+        </div>
+    </div>
+</div>
+<!-- form -->
+<script src="https://cdn.bootcss.com/jquery.form/4.2.1/jquery.form.min.js"></script>
+<!-- 验证插件 -->
+<script src="https://cdn.bootcss.com/jquery-validate/1.17.0/jquery.validate.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery-validate/1.17.0/localization/messages_zh.min.js"></script>
+<!-- alert 插件 -->
+<script src="https://cdn.bootcss.com/limonte-sweetalert2/7.21.1/sweetalert2.all.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        //设置验证码按钮失效事件
+        if ($.cookie("total1") != undefined && $.cookie("total1") != 'NaN' && $.cookie("total1") != 'null') { //cookie存在倒计时
+            timekeeping(); //按钮失效函数
+        } else { //cookie 没有倒计时
+            $('#validBtn').attr("disabled", false);
+        }
+
+        //validBtn失效函数
+        function timekeeping() {
+            //把按钮设置为不可以点击
+            $('#validBtn').attr("disabled", true);
+            var interval = setInterval(function () { //每秒读取一次cookie
+                //获取当前时间戳
+                var nowTimestamp = Math.round(new Date().getTime() / 1000);
+                //从cookie 中读取时间戳
+                var firstTimestamp = $.cookie("total1");
+                //剩余时间
+                var total = 60 - (nowTimestamp - firstTimestamp);
+
+                if (total > 0) { //剩余倒计时为零，则显示 重新发送，可点击
+                    //重新写入总倒计时,在发送按钮显示剩余倒计时
+                    $('#validBtn').html(total);
+                } else { //剩余倒计时不为零
+                    //删除cookie
+                    $.cookie("total1", "", {
+                        expires: -1
+                    });
+                    //显示重新发送
+                    $('#validBtn').html('获取').attr("disabled", false);
+                    //清除定时器
+                    clearInterval(interval);
+                }
+            }, 1000);
+        } //timekeeping end
+
+        //validBtn点击事件
+        $("#validBtn").click(function () {
+            //验证手机格式
+            var tel = $("#tel").val();
+            if (isPoneAvailable(tel)) {
+                //ajax获取验证码
+                $.ajax({
+                    url: "{:url('index/Bind/getValid')}",
+                    type: "post",
+                    data: {
+                        mobile: tel
+                    },
+                    dataType: "json",
+                    success: validSuccess,
+                    error: validError,
+                });
+            } else {
+
+                swal("", "手机格式错误", "error").catch(swal.noop);
+
+            }
+        }); //validBtn点击事件end
+
+        //ajax成功函数
+        function validSuccess(data) {
+
+            //获取返回信息
+            var code = data.code;
+            var msg = data.msg;
+            var validCode = data.validCode;
+            var telNumber = data.mobile;
+
+            //判断是否验证码发送成功
+            if (code == "000000") {
+                //按钮失效，防止用户重复点击
+                //获取时间对象
+                var btnDate = new Date();
+                //获取当前秒时间戳
+                var timestamp = Math.round(btnDate.getTime() / 1000);
+                //设置过期时间
+                btnDate.setTime(btnDate.getTime() + 1 * 60 * 1000); //只能这么写，1分钟
+
+                $.cookie("total1", timestamp, {
+                    expires: btnDate
+                }); //先设置cookie,失效时间
+                timekeeping();
+
+                //设置cookie储存验证码、手机号，设置失效失效为5分钟
+                var date = new Date();
+                date.setTime(date.getTime() + 5 * 60 * 1000); //只能这么写，5分钟
+                $.cookie("validCode", validCode, {
+                    expires: date
+                });
+                $.cookie("telNumber", telNumber, {
+                    expires: date
+                });
+
+                //显示信息
+                swal("", "获取验证码成功，有效时间5分钟，请尽快填写！", "success").catch(swal.noop);
+            } else {
+                //返回错误消息
+                swal("", msg, "error").catch(swal.noop);
+            }
+        }
+
+        //ajax失败函数
+        function validError(XMLHttpRequest, textStatus) {
+            console.log(XMLHttpRequest.status);
+            // 状态
+            console.log(XMLHttpRequest.readyState);
+            // 错误信息
+            console.log(textStatus);
+            swal("", "数据提交失败，请你重试", "error");
+        }
+
+        //-------表单验证--------
+        $("#orderForm").validate({
+            submitHandler: beforSub,
+            rules: {
+                tel: {
+                    required: true,
+                    minlength: 11,
+                    maxlength: 11,
+                },
+                validText: {
+                    required: true,
+                    minlength: 6,
+                    maxlength: 6,
+                }
+            },
+            messages: {
+                tel: {
+                    required: "请输入你的手机号",
+                    minlength: "手机位数错误",
+                    maxlength: "手机位数错误",
+                },
+                validText: {
+                    required: "请输入验证码",
+                    minlength: "验证码为6位",
+                    maxlength: "验证码为6位",
+                },
+            }
+        });
+
+        //beforSub函数
+        function beforSub(form) {
+            //参数对象
+            var validObj = {
+                url: "{:url('index/Bind/bindForm')}",
+                type: "post",
+                target: "",
+                //服务器返回的响应数据显示的元素(Id)号
+                beforeSerialize: function () {
+                }, //序列化提交数据之前的回调函数
+                beforeSubmit: showRequest,
+                //提交前执行的回调函数
+                success: showResponse, //提交成功后执行的回调函数
+                error: err, //提交失败执行的函数
+                dataType: "json",
+                //服务器返回数据类型
+                clearForm: true,
+                //提交成功后是否清空表单中的字段值
+                restForm: true,
+                //提交成功后是否重置表单中的字段值，即恢复到页面加载时的状态
+                timeout: 6000,
+                //设置请求时间，超过该时间后，自动退出请求，单位(毫秒)
+            };
+            //提交
+            $(form).ajaxSubmit(validObj);
+        } //表单验证，提交end
+
+        //提交前函数
+        //表单提交前验证函数
+        function showRequest() {
+            //判断验证码与手机号是否正确
+            var tel = $.trim($("#tel").val());
+            var validCode = $.trim($("#validText").val());
+
+            if (tel != $.trim($.cookie("telNumber"))) {
+                if ($.cookie("telNumber") == null) {
+                    swal("", "验证码已经过期了或没有获取", "error").catch(swal.noop);
+                } else {
+                    swal("", "手机号与获取验证码的手机号不一致", "error").catch(swal.noop);
+                }
+                return false;
+            }
+
+            if (validCode != $.trim($.cookie("validCode"))) {
+                if ($.cookie("validCode") == null) {
+                    swal("", "验证码已经过期了或没有获取", "error").catch(swal.noop);
+                } else {
+                    swal("", "验证码输入错误", "error").catch(swal.noop);
+                }
+
+                return false;
+            }
+
+            return true;
+        }
+
+        //提交成功函数
+        function showResponse(data) {
+            var errcode = data.errcode;
+            var errmsg = data.errmsg;
+            //输出信息
+            if (errcode == 0) {
+                swal({
+                    title: '绑定成功',
+                    text: errmsg,
+                    type: 'success',
+                    allowOutsideClick: false,
+                    confirmButtonText: '确定',
+                }).then(function () {
+                    //close windows
+                    WeixinJSBridge.call('closeWindow');
+                }).catch(swal.noop);
+            } else {
+                swal("绑定失败", errmsg, "error").catch(swal.noop);
+            }
+        }
+
+        //提交失败函数
+        function err() {
+            swal("", "服务器打瞌睡了，请重试", "error").catch(swal.noop);
+        }
+
+        //手机号码验证函数
+        function isPoneAvailable(str) {
+            var myreg = /^1[0-9]{10}$/;
+            if (myreg.test(str)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+    }); //jq end
+</script>
+</body>
+
+</html>

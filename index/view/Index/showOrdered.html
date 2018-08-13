@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>康泉综合门诊部</title>
+  <!-- 新 Bootstrap4 核心 CSS 文件 -->
+  <link href="https://cdn.bootcss.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+  <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+  <!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+  <script src="https://cdn.bootcss.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+</head>
+<style media="screen">
+  body {
+    background-color: rgb(242, 242, 242);
+  }
+
+  .box {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+
+  .boxColor {
+    background-color: rgb(191, 217, 244)
+  }
+</style>
+
+<body>
+  {assign name="i" value='1' /}
+  <div class="container">
+    <div class="row">
+      {volist name="data" id="one"}
+      <div class="card col-11 mx-auto box boxColor" style="margin-top:0.75em;">
+        <div class="card-header text-center">第{$i}条</div>
+        <div class="card-body">
+          <p class="card-text" style="dispaly:inline">预约老师=><span>{$one.docter}</span></p>
+          <p class="card-text">预约科室=><span>{$one.department}</span></p>
+          <p class="card-text">预约时间=><span>{$one.date}</span></p>
+          <button class="btn btn-primary btn-block">取消预约</button>
+        </div>
+      </div>
+      {/volist}
+    </div>
+  </div>
+
+  <!-- js -->
+  <!-- alert 插件 -->
+  <script src="https://cdn.bootcss.com/limonte-sweetalert2/7.21.1/sweetalert2.all.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      //给所有取消预约按钮添加事件
+      $("button").click(function() {
+        //获取数据
+        var docter = $(this).siblings("p:first").children().text();
+        var date = $(this).siblings("p:last").children().text();
+
+        //先弹出警告框
+        swal({
+          title: "确认取消吗？",
+          text: "取消后公众号的预约凭据作废。",
+          type: "warning",
+          showCancelButton: true,
+          showLoaderOnConfirm: true,
+          cancelButtonText: "取消",
+          confirmButtonText: "确认",
+          allowOutsideClick: false,
+        }).then(function(isConfirm) {
+          //只有点击确认才提交数据
+          if (isConfirm.value === true) {
+            //提交数据
+            $.ajax({
+              url: "{:url('index/index/cancelOrdered')}",
+              data: {
+                docter: docter,
+                date: date
+              },
+              type: "post",
+              dataType: "json",
+              success: cancelSuccess,
+              error: cancelError
+            });
+          }
+
+        }).catch(swal.noop);
+
+
+      });
+
+
+      //---------辅助函数----------
+      function cancelSuccess(data) {
+        var errcode = data.errcode;
+        var errmsg = data.errmsg;
+
+        //输出信息
+        if (errcode == 0) {
+          swal({
+            title: '取消成功',
+            text: errmsg,
+            type: 'success',
+            allowOutsideClick: false,
+            confirmButtonText: '确定',
+          }).then(function() {
+            //刷新页面
+            // window.location.href = window.location.href + "?id=" + 10000 * Math.random();
+            //close windows
+            window.location.reload();
+          }).catch(swal.noop);
+        } else {
+          swal("取消失败", errmsg, "error").catch(swal.noop);
+        }
+
+      }
+
+      function cancelError() {
+        swal("取消失败", '服务器出错了，请你重试。', "error").catch(swal.noop);
+      }
+    }); //jq end
+  </script>
+</body>
+
+</html>
