@@ -13,87 +13,31 @@ $data = ['kangquanid','kangquanrandid','pay']金额单位统一为分
 */
 namespace app\api\controller;
 
-use think\Controller;
 use app\api\model\User;
 use app\api\model\PrePay;
 
-class Pay extends Controller
+class Pay extends Base
 {
+    protected $user;//用户实例
+    protected $transaction_id;//交易订单号
+
     //生成订单
     public function createPay()
     {
-        //获取提交的数据
-        $jsonData = file_get_contents('php://input');
-        //解码json为array
-        $Arrdata = json_decode($jsonData, true);
-        //判断数据正确性
-        //正确=》判断用户是否绑定微信（userinfo表判断）
-        //绑定了组装数据
-        //写入数据库
-        if (array_key_exists('kangquanid', $Arrdata) && array_key_exists('kangquanrandid', $Arrdata) && array_key_exists('pay', $Arrdata)) {
-            //取得数据
-            $kangquanid = $Arrdata['kangquanid'];
-            $kangquanrandid = $Arrdata['kangquanrandid'];
-            $pay = $Arrdata['pay'];
-            //判断是否绑定微信
-            $user = User::get(['kangquanid' => $kangquanid]);
-
-            if ($user == null) {//未绑定
-                $backInfo = [
-                    'errcode' => '2',
-                    'errmsg' => '该用户没有绑定微信'
-                ];
-            } else {//绑定了
-                //组装数据
-                $payid = $this->createPayId();//生成订单号
-                $openid = $user->openid;
-                //写入费用表
-                $newUser = new PrePay;
-                $userData = [
-                    'payid' => $payid,
-                    'openid' => $openid,
-                    'kangquanid' => $kangquanid,
-                    'kangquanrandid' => $kangquanrandid,
-                    'pay' => (int)$pay,
-                    'time' => date('Y-m-d h:i:s')
-                ];
-                $res = $newUser->allowField(true)->save($userData);
-                if (false !== $res) {//写入成功
-
-                    //给用户发送支付提醒
-                    $result = $this->callUser($openid, $pay, $payid);
-                    if ($result['errcode'] == 0) {//发送成功
-                        $backInfo = [
-                            'errcode' => '0',
-                            'errmsg' => 'ok'
-                        ];
-                    } else {//发送失败
-                        $backInfo = [
-                            'errcode' => '4',
-                            'errmsg' => '给用户发送支付提醒失败'
-                        ];
-                    }
-
-                } else {//写入失败
-                    $backInfo = [
-                        'errcode' => '3',
-                        'errmsg' => '写入费用表失败'
-                    ];
-                }
-            }
-        } else {
-            $backInfo = [
-                'errcode' => '1',
-                'errmsg' => '提交数据有误，请仔细检查'
-            ];
-        }
-
-        //返回信息
-        return json($backInfo);
+        //获取验证成功，过滤后的参数
+        $paramArr = $this->filterParamArr;//base类的属性
+        //判断用户是否绑定信息
+        $this->is_bind($paramArr['kangquanid']);
+        //绑定了=》写入费用表
+        $this->write_payDb($paramArr);
+        //发送模板消息
+        $this->send_TemplateMsg($this->user->openid,$paramArr['pay'],$this->transaction_id);
+        //以上全部成功，测返回成功消息
+        $this->return_msg('0000','ok');
     }
 
-    //给用户发消息函数 金额单位/分
-    public function callUser($openid, $payTotal, $payid)
+    //发送模板消息函数
+    public function send_TemplateMsg($openid,$payTotal,$payid)
     {
         //组装数据
         $total = $payTotal / 100.0;
@@ -106,7 +50,45 @@ class Pay extends Controller
         ];
         //发送
         $msg = \think\Loader::model('TemplateMes', 'service');
-        return $msg->payMes($data);
+        $res =  $msg->payMes($data);
+
+        //判断发送结果
+        if($res['errcode'] !== 0){
+            $this->return_msg('5002','给用户微信发送模板消息失败');
+        }
+    }
+
+    //判断是否绑定函数
+    public function is_bind($kangquanid)
+    {
+        //判断是否绑定微信
+        $this->user = User::get(['kangquanid' => $kangquanid]);
+        if ($this->user == null) {
+            $this->return_msg('4006', '该用户未绑定微信');
+        }
+    }
+
+    //写入费用表函数
+    public function write_payDb($paramArr)
+    {
+        //组装数据
+        $this->transaction_id = $this->createPayId();//生成订单号
+        $openid = $this->user->openid;
+        //写入费用表
+        $newUser = new PrePay;
+        $userData = [
+            'payid' => $this->transaction_id,
+            'openid' => $openid,
+            'kangquanid' => $paramArr['kangquanid'],
+            'kangquanrandid' => $paramArr['kangquanrandid'],
+            'pay' => (int)$paramArr['pay'],
+            'time' => date('Y-m-d h:i:s')
+        ];
+        $res = $newUser->allowField(true)->save($userData);
+
+        if ($res === false){//写入失败时
+            $this->return_msg('5001','写入费用表失败，重试以下');
+        }
     }
 
     //生成订单号
