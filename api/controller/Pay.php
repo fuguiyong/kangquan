@@ -1,16 +1,7 @@
 <?php
 /*
-api使用说明
-$url = 'http://www.kangquanpay.top/createpaytb'
-需要提供的json数据：
-$data = ['kangquanid','kangquanrandid','pay']金额单位统一为分
-返回码
-0=》成功
-1=》提交数据有误
-2=》该病人没有绑定微信
-3=》写入费用表失败
-4=》发送付费消息失败
-*/
+api使用说明链接 https://www.zybuluo.com/fuguiyong/note/1250043
+\*/
 namespace app\api\controller;
 
 use app\api\model\User;
@@ -31,13 +22,13 @@ class Pay extends Base
         //绑定了=》写入费用表
         $this->write_payDb($paramArr);
         //发送模板消息
-        $this->send_TemplateMsg($this->user->openid,$paramArr['pay'],$this->transaction_id);
+        $this->send_TemplateMsg($this->user->openid, $paramArr['pay'], $this->transaction_id);
         //以上全部成功，测返回成功消息
-        $this->return_msg('0000','ok');
+        $this->return_msg('0000', 'ok');
     }
 
     //发送模板消息函数
-    public function send_TemplateMsg($openid,$payTotal,$payid)
+    public function send_TemplateMsg($openid, $payTotal, $payid)
     {
         //组装数据
         $total = $payTotal / 100.0;
@@ -50,11 +41,11 @@ class Pay extends Base
         ];
         //发送
         $msg = \think\Loader::model('TemplateMes', 'service');
-        $res =  $msg->payMes($data);
+        $res = $msg->payMes($data);
 
         //判断发送结果
-        if($res['errcode'] !== 0){
-            $this->return_msg('5002','给用户微信发送模板消息失败');
+        if ($res['errcode'] !== 0) {
+            $this->return_msg('5002', '给用户微信发送模板消息失败');
         }
     }
 
@@ -86,8 +77,8 @@ class Pay extends Base
         ];
         $res = $newUser->allowField(true)->save($userData);
 
-        if ($res === false){//写入失败时
-            $this->return_msg('5001','写入费用表失败，重试以下');
+        if ($res === false) {//写入失败时
+            $this->return_msg('5001', '写入费用表失败，重试以下');
         }
     }
 

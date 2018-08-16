@@ -42,7 +42,7 @@ Route::any('successPay$','index/Pay/payBack');//支付回调地址
 Route::get('payExplain$','index/Pay/payExplain');//支付回调地址
 Route::get('getDataView$','index/index/getDataView');//支付回调地址
 //--------api---------
-Route::post('createpaytb$','api/Pay/createPay');//创建费用表api
+Route::post('api/createpaytb$','api/Pay/createPay');//创建费用表api
 Route::post('sendmsgApi$','api/SendMes/sendMsg');//发送模板消息api
 
 return [
