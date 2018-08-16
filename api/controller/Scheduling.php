@@ -66,7 +66,7 @@ class Scheduling extends Base
     //验证盘班表的每条信息
     public function check_info($arr)
     {
-        $valid_ScheInfo = \think\Loader::validate('Docter_scheduling');
+        $valid_ScheInfo = \think\Loader::validate('DocterScheduling');
         if($valid_ScheInfo->check($arr)){
             return $arr;
         }else{

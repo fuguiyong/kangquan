@@ -11,7 +11,7 @@ namespace app\api\validate;
 use think\Validate;
 
 
-class Docter_scheduling extends Validate
+class DocterScheduling extends Validate
 {
     protected $rule = [
         'docter_id' => 'require',
