@@ -22,9 +22,9 @@ class Scheduling extends Base
     //api 入口
     public function insert_scheduling()
     {
+
         //获取验证成功，过滤后的参数
         $paramArr = $this->filterParamArr;//base类的属性
-        //dump($paramArr);
         //想排班表插入数据
         $sche = new SchedulingMod;
         $res = $sche->allowField(true)->saveAll($paramArr);
@@ -71,8 +71,8 @@ class Scheduling extends Base
                 $this->return_msg('4006', 'data里面内容错误，内容必须全部是数组类型');
             }
         }
-        //返回数据
-        return $arr;
+        //返回过滤后的数据
+        return $arr['data'];
 
     }
 

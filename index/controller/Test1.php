@@ -67,11 +67,12 @@ class Test1 extends Controller
 
     public function dayTest()
     {
-        echo "hello";
-      //  echo phpinfo();
-    $list = Ordered::paginate(3);
+//        echo "hello";
+//      //  echo phpinfo();
+//    $list = Ordered::paginate(3);
+//
+//    return view('index/test',['list'=>$list]);
 
-    return view('index/test',['list'=>$list]);
         // $arr = ['aaa','bbbb','cccc'];
         // $res = array_diff($arr,['bbb']);
         // dump($res);
@@ -82,7 +83,7 @@ class Test1 extends Controller
         // $date=date_create($date);
         // echo date_format($date,"Y-m-d");
 
-        // echo Cache::clear();
+         echo Cache::clear();
 
 
 // try {
