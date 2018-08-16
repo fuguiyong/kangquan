@@ -44,6 +44,8 @@ Route::get('getDataView$','index/index/getDataView');//支付回调地址
 //--------api---------
 Route::post('api/createpaytb$','api/Pay/createPay');//创建费用表api
 Route::post('sendmsgApi$','api/SendMes/sendMsg');//发送模板消息api
+Route::post('api/scheduling','api/Scheduling/insert_scheduling');//发送模板消息api
+
 
 return [
   '__pattern__' => [
