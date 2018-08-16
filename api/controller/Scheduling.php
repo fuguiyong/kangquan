@@ -8,6 +8,7 @@
 
 namespace app\api\controller;
 
+use app\api\model\SchedulingMod;
 
 class Scheduling extends Base
 {
@@ -23,7 +24,17 @@ class Scheduling extends Base
     {
         //获取验证成功，过滤后的参数
         $paramArr = $this->filterParamArr;//base类的属性
-        dump($paramArr);
+        //dump($paramArr);
+        //想排班表插入数据
+        $sche = new SchedulingMod;
+        $res = $sche->allowField(true)->saveAll($paramArr);
+
+        if($res !== false){
+            $this->return_msg('0000','ok');
+        }else{
+            $this->return_msg('5001','排班表插入失败');
+        }
+
     }
 
     //重新token验证规则
@@ -36,7 +47,7 @@ class Scheduling extends Base
         //验证token
         $client_token = $arr['token'];
         //验证规则
-        $server_token = md5('kangquan'.md5($arr['time']).'kangquan');
+        $server_token = md5('kangquan' . md5($arr['time']) . 'kangquan');
 
         if ($client_token !== $server_token) {
             $this->return_msg('4004', 'token不正确');
@@ -48,18 +59,20 @@ class Scheduling extends Base
     {
         unset($arr['time'], $arr['token']);
         //判断data是不是array
-        if(!is_array($arr['data'])){
-            $this->return_msg('4001','data参数错误，不是数组类型');
+        if (!is_array($arr['data'])) {
+            $this->return_msg('4005', 'data参数错误，不是数组类型');
         }
         //判断data里的内容是不是array
-        foreach ($arr['data'] as $value){
-            if(is_array($value)){
+        foreach ($arr['data'] as $value) {
+            if (is_array($value)) {
                 //验证每条信息
-               return $this->check_info($value);
-            }else{
-                $this->return_msg('4002','data里面内容错误，内容必须全部是数组类型');
+                $this->check_info($value);
+            } else {
+                $this->return_msg('4006', 'data里面内容错误，内容必须全部是数组类型');
             }
         }
+        //返回数据
+        return $arr;
 
     }
 
@@ -67,11 +80,11 @@ class Scheduling extends Base
     public function check_info($arr)
     {
         $valid_ScheInfo = \think\Loader::validate('DocterScheduling');
-        if($valid_ScheInfo->check($arr)){
-            return $arr;
-        }else{
-            $this->return_msg('4003','数据不符合规范');
+        if (!$valid_ScheInfo->check($arr)) {
+            $this->return_msg('4007', $valid_ScheInfo->getError());
         }
+
+
     }
 
 }

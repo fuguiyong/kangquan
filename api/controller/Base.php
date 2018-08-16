@@ -24,9 +24,9 @@ class Base extends Controller
         $jsonData = file_get_contents('php://input');
         $this->paramArr = json_decode($jsonData, true);
         //验证时间错
-        $this->check_time(@$this->paramArr['time']);
+        //$this->check_time(@$this->paramArr['time']);
         //验证token
-        $this->check_token($this->paramArr);
+        //$this->check_token($this->paramArr);
         //返回过滤字段
         $this->filterParamArr = $this->filter_param($this->paramArr);
     }
