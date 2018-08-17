@@ -22,7 +22,7 @@ use app\index\model\UserInfo;//用户模型
 use app\index\model\Visit;//就诊模型
 use app\index\model\Ordered;//预约模型
 use app\index\logic\UpdateLogic;
-
+use PHPMailer\PHPMailer;
 
 class Test1 extends Controller
 {
@@ -67,6 +67,56 @@ class Test1 extends Controller
 
     public function dayTest()
     {
+        try{
+            throw new \Exception("ddd");
+        }catch(\Exception $e){
+            echo 'sdad';
+        }
+
+
+//        $data = [
+//            'out_trade_no' => md5(time()),
+//            'total_fee' => 1,
+//            'body' => '扫码支付测试',
+//           'product_id'=>md5(time()).'520'
+//
+//        ];
+//        $weChatPay = \think\Loader::model('UnifiedOrder','service');
+//       $resArr = $weChatPay->native($data);
+//       dump($resArr);
+
+/*        $mail = new PHPMailer();
+        $mail->isSMTP();// 使用SMTP服务
+        $mail->CharSet = "utf8";// 编码格式为utf8，不设置编码的话，中文会出现乱码
+        $mail->Host = "smtp.163.com";// 发送方的SMTP服务器地址
+        $mail->SMTPAuth = true;// 是否使用身份验证
+        $mail->Username = "fuguiyong666@163.com";// 发送方的163邮箱用户名
+        $mail->Password = "fu760720981";// 发送方的邮箱密码，注意用163邮箱这里填写的是“客户端授权密码”而不是邮箱的登录密码！
+        $mail->SMTPSecure = "ssl";// 使用ssl协议方式
+        $mail->Port = 994;// 163邮箱的ssl协议方式端口号是465/994
+        $mail->From = "fuguiyong666@163.com";
+        $mail->setFrom("fuguiyong666@163.com", "付贵勇");// 设置发件人信息，如邮件格式说明中的发件人，这里会显示为Mailer(xxxx@163.com），Mailer是当做名字显示
+        $mail->addAddress('760720981@qq.com', '付贵勇');// 设置收件人信息，如邮件格式说明中的收件人，这里会显示为Liang(yyyy@163.com)
+        $mail->IsHTML(true);
+        $mail->Subject = 'HELLO PHP';// 邮件标题
+        $mail->Body = 'PHP IS THE BEST LANGUAGE';// 邮件正文
+        if (!$mail->send()) {// 发送邮件
+            echo "Message could not be sent.";
+            echo "Mailer Error: " . $mail->ErrorInfo;// 输出错误信息
+        } else {
+            echo 'Message has been sent.';
+        }*/
+
+
+        //-------------------------
+//        header('content-type:application/json;charset=utf-8');
+//        $data = [
+//            'aa'=>'bbb',
+//            'tt'=>'ttrrt'
+//        ];
+//        die(json_encode($data,JSON_UNESCAPED_UNICODE));
+
+        // return json($data);
 //        echo "hello";
 //      //  echo phpinfo();
 //    $list = Ordered::paginate(3);
@@ -83,7 +133,7 @@ class Test1 extends Controller
         // $date=date_create($date);
         // echo date_format($date,"Y-m-d");
 
-         echo Cache::clear();
+        // echo Cache::clear();
 
 
 // try {
