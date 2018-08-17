@@ -23,7 +23,7 @@ use app\index\model\Visit;//就诊模型
 use app\index\model\Ordered;//预约模型
 use app\index\logic\UpdateLogic;
 use PHPMailer\PHPMailer;
-
+require_once 'phpqrcode/phpqrcode.php'; //�������
 class Test1 extends Controller
 {
     public function formValid()
@@ -67,11 +67,12 @@ class Test1 extends Controller
 
     public function dayTest()
     {
-        try{
-            throw new \Exception("ddd");
-        }catch(\Exception $e){
-            echo 'sdad';
-        }
+
+        $url = 'weixin://wxpay/bizpayurl?pr=sSh6RJS';
+
+        $text = "https://www.liminghulian.com/";
+        $logo = './a.png';
+        QRcode::png($text,false,'H',4,2,false);
 
 
 //        $data = [
