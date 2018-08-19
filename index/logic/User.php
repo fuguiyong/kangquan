@@ -355,6 +355,7 @@ class User extends Model
                 //---------------向门诊返回成功消息----------
 
             }
+
             //向微信返回成功消息
             return 'success';
 
