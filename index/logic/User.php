@@ -318,10 +318,12 @@ class User extends Model
             } else {//业务结果验证失败,写错误日志
                 $date = date("Y-m-d h:i:s");//获取时间
                 file_put_contents('./log/err/payerr.txt', $date . '-订单号-' . $arrData['transaction_id'] . '-业务结果验证失败' . PHP_EOL, FILE_APPEND);
+                die;
             }
         } else {//签名验证失败，写错误日志
             $date = date("Y-m-d h:i:s");//获取时间
             file_put_contents('./log/err/payerr.txt', $date . '-订单号-' . $arrData['transaction_id'] . '-签名验证失败' . PHP_EOL, FILE_APPEND);
+            die;
         }
 
     }
@@ -359,6 +361,7 @@ class User extends Model
         } else {//金额验证失败
             $date = date("Y-m-d h:i:s");//获取时间
             file_put_contents('./log/err/payerr.txt', $date . '-订单号-' . $arrData['transaction_id'] . '-金额验证失败' . PHP_EOL, FILE_APPEND);
+            die;
         }
 
     }

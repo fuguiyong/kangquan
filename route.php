@@ -39,7 +39,8 @@ Route::any('ordered$', 'index/Order/ordered');//预约挂号引导路由
 Route::any('tobinding$','index/Bind/toBind');//绑定信息引导路由
 Route::any('pay/[:transaction_id]$','index/Pay/toPay');//支付引导路由
 Route::any('successPay$','index/Pay/payBack');//公众号支付回调地址
-Route::any('successNative$','index/Pay/payBack');//NATIVE支付回调地址
+Route::any('successNative$','index/Pay/successNative');//NATIVE支付回调地址
+Route::any('successAlipay$','index/Pay/alipay');//支付宝回调地址
 Route::get('payExplain$','index/Pay/payExplain');//支付说明地址
 Route::get('getDataView$','index/index/getDataView');//个人信息展示地址
 //--------api---------
