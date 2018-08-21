@@ -1,9 +1,7 @@
 <?php
 namespace app\index\controller;
 
-use think\Controller;
 use aliyunSms\SendMsg;//阿里云
-
 // use smsDemo\smsyzm;//云之讯
 
 class Bind extends Base
