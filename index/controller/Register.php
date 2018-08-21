@@ -1,11 +1,8 @@
 <?php
 namespace app\index\controller;
 
-use think\Controller;
-use think\Session;
-use app\index\model\UserInfo;//用户模型
-use aliyunSms\SendMsg;//阿里云
 
+use aliyunSms\SendMsg;//阿里云
 // use smsDemo\smsyzm;//云之讯
 
 class Register extends Base

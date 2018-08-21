@@ -1,7 +1,6 @@
 <?php
 namespace app\index\controller;
 
-use think\Controller;
 use think\Session;
 use app\index\model\UserInfo;//用户模型
 use app\index\model\Ordered;//预约表模型
