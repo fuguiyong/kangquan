@@ -5,57 +5,45 @@ use think\Session;
 use app\index\model\UserInfo;//用户模型
 use think\Validate;
 
-class UpdateLogic
+class UpdateLogic extends Base
 {
     //telForm logic
     public function telForm()
     {
 
-        try {
             $tel = input('post.tel');
             $token = input('__token__');
             //验证token
             $valid = validate('Token');
             $telvalid = validate('User');
-            $res = $valid->check(['__token__' => $token]);
+
+            //===========strat============
             //验证数据
-            if ($res) {//token验证成功
-                $restel = $telvalid->scene('tel')->check(['tel' => $tel]);
-                if ($restel) {//数据验证成功
-                    //获取用户的openid
-                    $openid = Session::get('user.openid');
-                    $user = UserInfo::get(['openid' => $openid]);
-                    $user->tel = $tel;
-                    $resmysql = $user->isUpdate(true)->save();
-                    if ($resmysql !== false) {
-                        $backInfo = [
-                            'errcode' => '0',
-                            'errmsg' => '手机号码修改成功'
-                        ];
-                    } else {
-                        $backInfo = [
-                            'errcode' => '3',
-                            'errmsg' => '服务器错误，请你重试'
-                        ];
-                    }
-                } else {
-                    $backInfo = [
-                        'errcode' => '2',
-                        'errmsg' => $telvalid->getError() . '请你重试'
-                    ];
-                }
-            } else {
-                $backInfo = [
-                    'errcode' => '1',
-                    'errmsg' => $valid->getError() . '请你重试'
-                ];
+            $tokenRes = $valid->check(['__token__' => $token]);
+            $dataRes =  $telvalid->scene('tel')->check(['tel' => $tel]);
+
+            if(!$tokenRes){
+                $this->return_msg('1',$valid->getError());
             }
-        } catch (\Exception $e) {
-            file_put_contents('err.txt', $e->getMessage());
-        }
 
+            if(!$dataRes){
+                $this->return_msg('2',$valid->getError());
+            }
 
-        return json($backInfo);
+            //修改数据
+            //获取用户的openid
+            $openid = Session::get('user.openid');
+            $user = UserInfo::get(['openid' => $openid]);
+            $user->tel = $tel;
+            $resmysql = $user->isUpdate(true)->save();
+
+            if($resmysql !== false){
+                $this->return_msg('0','手机号码修改成功');
+            }else{
+                $this->$this->return_msg('3','服务器错误，请你重试');
+            }
+
+            //============end==============
 
     }
 
@@ -82,6 +70,7 @@ class UpdateLogic
                 'errcode' => '0',
                 'errmsg' => '你已经成功注销信息。'
             ];
+
 
         }
 
@@ -123,52 +112,39 @@ class UpdateLogic
     {
         $user->sex = $value;
         $res = $user->save();
-        if ($res !== false) {//数据库写入成功
-            $backInfo = [
-                'errcode' => '0',
-                'errmsg' => '信息修改成功',
-                'successData' => $value
-            ];
-        } else {
-            $backInfo = [
-                'errcode' => '2',
-                'errmsg' => '服务器处理错误，请你重试'
-            ];
 
+        if($res !== false){
+            $this->return_msg('0','性别修改成功',$value);
+        }else{
+            $this->return_msg('1','服务器错误，请你重试');
         }
-        return $backInfo;
+
     }
 
     private function updateName($user, $value)
     {
         $rule = ['username' => 'require|chs|length:2,15'];
+        $msg = [
+            'username.require' => '名字必须',
+            'username.chs' => '名字必须是汉字',
+            'username.length' => '名字长度2-15'
+        ];
         $data = ['username' => $value];
-        $validate = new Validate($rule);
+        $validate = new Validate($rule,$msg);
 
-        if ($validate->check($data)) {//数据验证成功
-            $user->username = $value;
-            $res = $user->save();
-            if ($res !== false) {//数据库写入成功
-                $backInfo = [
-                    'errcode' => '0',
-                    'errmsg' => '信息修改成功',
-                    'successData' => $value
-                ];
-            } else {
-                $backInfo = [
-                    'errcode' => '2',
-                    'errmsg' => '服务器处理错误，请你重试'
-                ];
-
-            }
-        } else {//数据验证失败
-            $backInfo = [
-                'errcode' => '1',
-                'errmsg' => $validate->getError() . '请你重试'
-            ];
+        //验证数据
+        if (!$validate->check($data)) {
+            $this->return_msg('1', $validate->getError());
+        }
+        //修改数据
+        $user->username = $value;
+        $res = $user->save();
+        if ($res !== false) {
+            $this->return_msg('0', '名字修改成功', $value);
+        } else {
+            $this->return_msg('2', '服务器错误，请你重试');
         }
 
-        return $backInfo;
 
     }
 
@@ -176,34 +152,27 @@ class UpdateLogic
     {
 
         $rule = ['age' => 'require|between:1,120'];
+        $msg = [
+            'age.require' => '必须输入年龄',
+            'age.between' => '年龄只能是1-120'
+        ];
         $data = ['age' => $value];
-        $validate = new Validate($rule);
+        $validate = new Validate($rule, $msg);
 
-        if ($validate->check($data)) {//数据验证成功
-            $user->age = $value;
-            $res = $user->save();
-            if ($res !== false) {//数据库写入成功
-                $backInfo = [
-                    'errcode' => '0',
-                    'errmsg' => '信息修改成功',
-                    'successData' => $value
-                ];
-            } else {
-                $backInfo = [
-                    'errcode' => '2',
-                    'errmsg' => '服务器处理错误，请你重试'
-                ];
-
-            }
-        } else {//数据验证失败
-            $backInfo = [
-                'errcode' => '1',
-                'errmsg' => $validate->getError() . '请你重试'
-            ];
+        //===========start===========
+        //验证数据格式
+        if (!$validate->check($data)) {
+            $this->return_msg('1', $validate->getError());
         }
-
-        return $backInfo;
-
+        //写入数据库
+        $user->age = $value;
+        $res = $user->save();
+        if ($res !== false) {
+            $this->return_msg('0', '年龄修改成功', $value);
+        } else {
+            $this->return_msg('2', '服务器处理错误，请你重试');
+        }
+        //============end=============
 
     }
 
