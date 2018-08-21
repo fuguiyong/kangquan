@@ -1,13 +1,11 @@
 <?php
 namespace app\index\controller;
 
-use think\Controller;
 use think\Session;
 use app\index\model\UserInfo;//用户模型
 use service\XmlArray;
-use app\api\model\PrePay;//费用表模型
 
-class Pay extends Controller
+class Pay extends Base
 {
     //支付说明
     public function payExplain()

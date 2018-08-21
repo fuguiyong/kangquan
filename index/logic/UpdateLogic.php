@@ -1,12 +1,11 @@
 <?php
 namespace app\index\logic;
 
-use think\Model;
 use think\Session;
 use app\index\model\UserInfo;//用户模型
 use think\Validate;
 
-class UpdateLogic extends Model
+class UpdateLogic
 {
   //telForm logic
   public function telForm()

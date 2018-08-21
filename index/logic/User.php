@@ -1,7 +1,7 @@
 <?php
 namespace app\index\logic;
 
-use think\Model;
+
 use think\Session;
 use think\Db;
 use app\index\model\UserInfo;//用户信息模型
@@ -11,7 +11,7 @@ use app\weixin\exClass\weixin\WeAuthorize;//授权服务类
 use myWeChatPay\weChatPay;//支付类
 
 
-class User extends Model
+class User extends Base
 {
 
     //用户自动登录
