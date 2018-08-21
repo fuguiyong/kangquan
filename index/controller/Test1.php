@@ -23,6 +23,7 @@ use app\index\model\Visit;//就诊模型
 use app\index\model\Ordered;//预约模型
 use app\index\logic\UpdateLogic;
 use PHPMailer\PHPMailer;
+use alipay\Alipay;
 
 class Test1 extends Controller
 {
@@ -64,24 +65,60 @@ class Test1 extends Controller
         //   }
     }
 
+    public function alipay()
+    {
+        file_put_contents('alipay.txt', 'sss', FILE_APPEND);
+        echo 'SUCCESS';
+        die;
+    }
+
+    public function returnUrl()
+    {
+        echo 'hello alipay';
+    }
 
     public function dayTest()
     {
-        vendor('phpqrcode.phpqrcode');
+
+
+        //配置参数
+        $appid = '2016091700535276';
+        $private_key = 'MIIEpAIBAAKCAQEAurWMHdS844/tjVNEYueInbPZb643SxLcJkSSmpkTUNy5TGUG06n0qKzuU15tpSnBJY5X2DbwksoIwhugFhWcwspdbGeIsh2Mjhg7cH0+92k7cUpzijj2e2OezrCR+6EBOzuygfCyZGy/mfEGrBtUExtgJ3xk8FBaWqClmpCUkjNmsu5SU7/5UcuwWFA/iqKM+O4yFEm3XJjgOJLfNrXH3OMwa3v7acWoLsJj7/R9SxdVJOdD/GHY5mlrFgZGyMZOvIKKHAqWO3hrpiiLw3YW6loGJnLl+g8aZlhBC3OM3ibG1zogIuKJCVizk1THtqo4MSHi5As/EbkiMwVLi5qf5QIDAQABAoIBABvcCRtOahz+lfC3kwW7DKyTcId0lHWUS9s98i41VyeCt/eJP5qHyqT8oNc5yNyTPWnQMpVlpUIR+XqVSq7g7LI4JfaOAFyrghSV0xC275VVU3RVKqZeV5ETzVeEC1Rjst5Wyw0OkF/hxjk/OMKnlUUAmblqm1ksdD7/p5ZHqpOh7C0S9yauCH8d5siQBk87roetkPBh6dWU711m2w/nb8xXy0PRBJP+QZKOCWEaySfzaKE/FZHGqh7f+C0a/UKUMp11EY42Xvz4B05ll1XBsIwP7EuRGy7J2CiO76UcnqmuB/kSrS61RgSAiiCWWwxBcgRjVBbyUWKfxCt6Unm5J4UCgYEA9Tysx/dV0cmJTL7oFSBxuoYnlzmZNFWBC3xWom2XlSKqy2BHDFBurxR2U0azAhqtLe1VxPJFljg3LQALP6D1wxpp28j1HODp1xjPvl0YNQ0alPfRLPwd9UAKueJryY/LY/UFMOjUCIEuZX2fTilAH6wahxFfjKBxRZHKw1u2PBcCgYEAwudKkPDrtRoW727RxfYCs6B0cMKwCPG2FOqQyDFSWoZK8Hsc1uIvlfF+uOgvR8FTBbexkd2TFmyx92AqjwHes/UJz6stNnVqa6ZtudyP7X54G/v97hW2HSeVRy28S8sNq9crKcczDfRLU2wBxMYGlYAZHxTdlax+G/MGEkcYlWMCgYEA4FOxRXX1deKiCqbzCyhTgCjpnEae4yV31rbVVN1k9JHyo/kc5KHKrbLNDh407y7RzZo1g+OOTfx8VFie8YReaysFPHwV42XF4fGbTuo/k3+6Ghyapki1ars7VJBOwuEbTwM5zWSdWG46r7H7AHdxZcd7uKPmwG+fTeEwFgYVq98CgYAwuye3qaUleMp3PxwQBPyT8PBsKSFeeyDtheCBTWOr4pvmGMITMCZ5tRHcJaF8rWeWrGEneWEHYFH26gJ6Exudnwy+8auyTBU5qTkSGYWa+d4KES1iU+dezsDSNSs5QCHA72GJZpbrTENxLjYa/vAyfP7K+KqWe7RkRJUmCMSqxQKBgQCNXxmFFEuAzV7WRoAiHcRpmBzGPGre5OwSnbf6x4riswpJbvjop2Pxrvb0ZUOVK/cY7zfIsTLN1wuXs3OWlqLCbzWL4ZMrFSIhn5mM8t8lIdCU9jSz4zWN627pqzJbsqcAijFbbMObJ8+3ETt3YsuJ5FYS5UmHaUx6+eXyH4Tpdg==';
+        $notify_url = 'http://www.kangquanpay.top/successAlipay';
+        $return_url = 'http://www.kangquanpay.top/returnAlipay';
+
+        //支付宝
+        $alipay = new Alipay();
+        $alipay->set_appid($appid);
+        $alipay->set_notify_url($notify_url);
+        $alipay->set_private_key($private_key);
+        $alipay->set_return_url($return_url);
+
         $data = [
-            'out_trade_no' => md5(time()),
-            'total_fee' => 1,
-            'body' => '扫码支付测试',
-            'product_id' => md5(time()) . '520'
-
+            'out_trade_no' => date('YmdHis'),
+            'total' => 0.01,
+            'subject' => '支付宝支付测试'
         ];
-        $weChatPay = \think\Loader::model('UnifiedOrder', 'service');
-        $resArr = $weChatPay->native($data);
 
-        $url = $resArr['code_url'];
+        //开始请求
+        $alipay->createAlipay($data);
 
-        \QRcode::png($url, false, 'H', 6, 2, false);
-        die;
+        //-----------微信网站二维码支付---------
+//        vendor('phpqrcode.phpqrcode');
+//        $data = [
+//            'out_trade_no' => md5(time()),
+//            'total_fee' => 1,
+//            'body' => '扫码支付测试',
+//            'product_id' => md5(time()) . '520'
+//
+//        ];
+//        $weChatPay = \think\Loader::model('UnifiedOrder', 'service');
+//        $resArr = $weChatPay->native($data);
+//
+//        $url = $resArr['code_url'];
+//
+//        \QRcode::png($url, false, 'H', 6, 2, false);
+//        die;
 
 
         /*        $mail = new PHPMailer();

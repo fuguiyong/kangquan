@@ -3,13 +3,12 @@ namespace app\index\logic;
 
 use think\Model;
 use think\Session;
-use curl\Curl;
 use think\Db;
 use app\index\model\UserInfo;//用户信息模型
 use app\api\model\PrePay;//需要支付费用表模型
 use app\index\model\Payed;//已经支付费用表模型
-use service\XmlArray;//xml<=>arr
 use app\weixin\exClass\weixin\WeAuthorize;//授权服务类
+use myWeChatPay\weChatPay;//支付类
 
 
 class User extends Model
@@ -241,7 +240,7 @@ class User extends Model
     }
     //预约挂号表单
 
-    //缴费实现
+    //============缴费实现==========
     public function pay($openid)//进来就获取了
     {
         //获取用户带的transaction_id参数（订单号）
@@ -264,20 +263,34 @@ class User extends Model
             $total_fee = $userPrepay->pay;
             //提示信息
             $body = '康泉门诊缴费中心';
-            //组装数据
-            $data = [
-                'out_trade_no' => $id,
-                'openid' => $openid,
-                'total_fee' => $total_fee,
-                'body' => $body
-            ];
-            //调统一接口api 获取prepay_id
-            $unified = \think\Loader::model('UnifiedOrder', 'service');
-            $prepay_id = $unified->getPrepayId($data);
-            //获取 JsParam(json编码后的字符串)
-            $jsParam = $unified->getJsParam($prepay_id);
-            //返回到前端执行
-            return $jsParam;
+            //回调地址
+            $notify_url = 'http://www.kangquanpay.top/successPay';
+            //=======myWeChatPay======
+            $weChatPay = new weChatPay();
+            //配置参数
+            $weChatPay->set_appid(APPID);
+            $weChatPay->set_notify_url($notify_url);
+            $weChatPay->set_mch_id(PAYID);
+            $weChatPay->set_pay_key(PAYKEY);
+            //开始请求获取jsParam
+            return $weChatPay->getJsParam($id,$body,$total_fee,$openid);
+
+//==============第一个方法========
+//            //组装数据
+//            $data = [
+//                'out_trade_no' => $id,
+//                'openid' => $openid,
+//                'total_fee' => $total_fee,
+//                'body' => $body
+//            ];
+//            //调统一接口api 获取prepay_id
+//            $unified = \think\Loader::model('UnifiedOrder', 'service');
+//            $prepay_id = $unified->getPrepayId($data);
+//            //获取 JsParam(json编码后的字符串)
+//            $jsParam = $unified->getJsParam($prepay_id);
+//            //返回到前端执行
+//            return $jsParam;
+
             //return view('pay',['jsParam'=>$jsParam]);
 
             //--------------other demo-------------------

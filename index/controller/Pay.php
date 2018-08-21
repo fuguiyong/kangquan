@@ -61,18 +61,6 @@ class Pay extends Controller
             file_put_contents('./log//err/payerr.txt', $date . '-订单号-' . $arrData['transaction_id'] . '-总验证失败' . PHP_EOL, FILE_APPEND);
         }
 
-        /*        //获取微信返回的订单号,判断是否修改了状态(是否在payed表添加该订单)
-                $out_trade_no = $arrData['out_trade_no'];
-                //在自己数据库查询该订单是否修改支付状态
-                $kangquanPayId = PrePay::get(['payid' => $out_trade_no]);
-                //判断订单修改状态
-                if ($kangquanPayId == null) {//该订单已经修改,抛弃微信请求
-                    echo 'SUCCESS';
-                    die;
-                } else {//订单第一次请求，开始修改状态
-
-                }*/
-
     }
 
     //扫码支付回调地址
@@ -83,11 +71,6 @@ class Pay extends Controller
 
     }
 
-    //支付宝测试回调地址
-    public function alipay()
-    {
-
-    }
 
 }
 
