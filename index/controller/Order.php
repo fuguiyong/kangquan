@@ -1,21 +1,18 @@
 <?php
 namespace app\index\controller;
 
-use think\Controller;
 use think\Session;
 use app\index\model\UserInfo;//用户模型
 use app\index\model\Docter;//医生表模型
-use think\Cache;//缓存
-use DateTime;
 
-class Order extends Controller
+class Order extends Base
 {
     //挂号首页
     public function ordered()
     {
         //获取信息自动登录
         $url = 'http://www.kangquanpay.top/ordered';
-        login($url);
+        $this->login($url);
 
         //判断用户是否注册了，否则先请用户注册
         $openid = Session::get('user.openid');

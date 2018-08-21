@@ -8,7 +8,7 @@ use app\index\model\Ordered;//预约表模型
 use app\index\model\Visit;//就诊历史模型
 use aliyunSms\SendMsg;//阿里云
 
-class Index extends Controller
+class Index extends Base
 {
   //首页
   public function index()
@@ -82,7 +82,7 @@ class Index extends Controller
   {
     //自动登录
     $url = 'http://www.kangquanpay.top/getDataView';
-    login($url);
+    $this->login($url);
 
     //判断用户是否注册了，否则先请用户注册
     $openid = Session::get('user.openid');

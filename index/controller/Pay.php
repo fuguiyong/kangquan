@@ -18,8 +18,7 @@ class Pay extends Base
     {
         //用户自动登录
         $url = 'http://www.kangquanpay.top/pay';
-        $userLogin = \think\Loader::model('User', 'logic');
-        $userLogin->login($url);//因为动态地址获取不行，所以为了通用就传入redirect_url
+        $this->login($url);
         //获取openid
         $openid = Session::get('user.openid');
         //先判断用户是否绑定微信
