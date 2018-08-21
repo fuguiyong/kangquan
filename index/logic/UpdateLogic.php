@@ -11,39 +11,39 @@ class UpdateLogic extends Base
     public function telForm()
     {
 
-            $tel = input('post.tel');
-            $token = input('__token__');
-            //验证token
-            $valid = validate('Token');
-            $telvalid = validate('User');
+        $tel = input('post.tel');
+        $token = input('__token__');
+        //验证token
+        $valid = validate('Token');
+        $telvalid = validate('User');
 
-            //===========strat============
-            //验证数据
-            $tokenRes = $valid->check(['__token__' => $token]);
-            $dataRes =  $telvalid->scene('tel')->check(['tel' => $tel]);
+        //===========strat============
+        //验证数据
+        $tokenRes = $valid->check(['__token__' => $token]);
+        $dataRes = $telvalid->scene('tel')->check(['tel' => $tel]);
 
-            if(!$tokenRes){
-                $this->return_msg('1',$valid->getError());
-            }
+        if (!$tokenRes) {
+            $this->return_msg('1', $valid->getError());
+        }
 
-            if(!$dataRes){
-                $this->return_msg('2',$valid->getError());
-            }
+        if (!$dataRes) {
+            $this->return_msg('2', $valid->getError());
+        }
 
-            //修改数据
-            //获取用户的openid
-            $openid = Session::get('user.openid');
-            $user = UserInfo::get(['openid' => $openid]);
-            $user->tel = $tel;
-            $resmysql = $user->isUpdate(true)->save();
+        //修改数据
+        //获取用户的openid
+        $openid = Session::get('user.openid');
+        $user = UserInfo::get(['openid' => $openid]);
+        $user->tel = $tel;
+        $resmysql = $user->isUpdate(true)->save();
 
-            if($resmysql !== false){
-                $this->return_msg('0','手机号码修改成功');
-            }else{
-                $this->$this->return_msg('3','服务器错误，请你重试');
-            }
+        if ($resmysql !== false) {
+            $this->return_msg('0', '手机号码修改成功');
+        } else {
+            $this->$this->return_msg('3', '服务器错误，请你重试');
+        }
 
-            //============end==============
+        //============end==============
 
     }
 
@@ -113,10 +113,10 @@ class UpdateLogic extends Base
         $user->sex = $value;
         $res = $user->save();
 
-        if($res !== false){
-            $this->return_msg('0','性别修改成功',$value);
-        }else{
-            $this->return_msg('1','服务器错误，请你重试');
+        if ($res !== false) {
+            $this->return_msg('0', '性别修改成功', $value);
+        } else {
+            $this->return_msg('1', '服务器错误，请你重试');
         }
 
     }
@@ -130,7 +130,7 @@ class UpdateLogic extends Base
             'username.length' => '名字长度2-15'
         ];
         $data = ['username' => $value];
-        $validate = new Validate($rule,$msg);
+        $validate = new Validate($rule, $msg);
 
         //验证数据
         if (!$validate->check($data)) {
