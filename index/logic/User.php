@@ -34,94 +34,61 @@ class User extends Base
         //验证token
         $valid = validate('Token');
         $res = $valid->check(['__token__' => $token]);
-
-        if ($res)//token验证成功
-        {
-            //先判断是否注册(条件还可以优化)
-            $user1 = UserInfo::get(['openid' => $openid]);
-
-            if ($user1 == null) { //未注册
-
-                //-------调接口注册--------
-
-                if (true)//注册接口成功
-                {
-                    try {
-
-                        //数据库注册一份
-                        $user2 = new UserInfo;
-                        $user2->tel = $tel;
-                        $user2->username = $name;
-                        $user2->nickname = $nickname;
-                        $user2->sex = $sex;
-                        $user2->openid = $openid;
-                        $user2->headimgurl = $headimgurl;
-                        $user2->age = $age;
-                        $user2->kangquanid = 'testid';
-                        $mysqlres = $user2->allowField(true)->save();
-
-                        if ($mysqlres !== false) {//数据库成功
-                            //如果都注册成功给用户发送模板消息
-                            //实例化service类
-                            $template = \think\Loader::model('TemplateMes', 'service');
-                            //组装信息
-                            $time = date("Y-m-d H:i:s");
-                            $info = [
-                                'openid' => $openid,
-                                'name' => $name,
-                                'time' => $time
-                            ];
-                            //发送
-                            $templateRes = $template->registerMes($info);
-                            if ($templateRes['errcode'] == 0) {//模板消息发送成功
-                                //设置返回信息
-                                $backInfo = [
-                                    'errcode' => '0',
-                                    'errmsg' => '请返回公众号继续其他操作，谢谢合作。'
-                                ];
-                            } else {//模板消息失败
-                                //设置返回信息
-                                $backInfo = [
-                                    'errcode' => '0',
-                                    'errmsg' => '但是由于微信服务器出现错误，你不会在公众号收到注册成功的消息，但是没有影响。'
-                                ];
-                            }
-
-                        } else {//数据库写入失败
-                            $backInfo = [
-                                'errcode' => '4',
-                                'errmsg' => '服务器打瞌睡了，请你重试。'
-                            ];
-                        }
-
-                    } catch (\Exception $e) {
-                        $date = date("Y-m-d h:i:s");//获取时间
-                        file_put_contents('./log/err/bind.txt', $date . ' ' . $openid . '注册失败' . PHP_EOL, FILE_APPEND);
-                    }
-
-                } else {//注册接口失败
-                    $backInfo = [
-                        'errcode' => '2',
-                        'errmsg' => '服务器打瞌睡了，请你重试。'
-                    ];
-                }
-
-            } else {//注册过
-                $backInfo = [
-                    'errcode' => '1',
-                    'errmsg' => '你已经注册过了(一个微信号只能注册一个账号)'
-                ];
-            }
-        } else {//token 验证失败
-            $backInfo = [
-                'errcode' => '3',
-                'errmsg' => $valid->getError() . '请你重试'
-            ];
+        if (!$res) {
+            $this->return_msg('3', $valid->getError());
         }
 
-        //返回注册结果
-        return json($backInfo);
+        //判断是否注册过
+        $user1 = UserInfo::get(['openid' => $openid]);
+        if (!empty($user1)) {
+            $this->return_msg('1', '你已经注册过了(一个微信号只能注册一个账号)');
+        }
+
+        //=========掉门诊部接口==========
+        //=======接口错误，直接返回信息，推出=======
+        //=========接口成功，向服务器写一份数据==========
+        //数据库注册一份
+        $user2 = new UserInfo;
+        $user2->tel = $tel;
+        $user2->username = $name;
+        $user2->nickname = $nickname;
+        $user2->sex = $sex;
+        $user2->openid = $openid;
+        $user2->headimgurl = $headimgurl;
+        $user2->age = $age;
+        $user2->kangquanid = 'testid';
+        $mysqlres = $user2->allowField(true)->save();
+        if ($mysqlres !== false) {
+            //x向用户微信发送消息
+            $this->send_register_Msg($openid,$name);
+        } else {
+            $this->return_msg('2', '服务器错误，请你重试');
+        }
+        //============== end =============
+
     }//注册 end
+
+    //注册成功发送消息
+    public function send_register_Msg($openid,$name)
+    {
+        //实例化service类
+        $template = model('TemplateMes', 'service');
+        //组装信息
+        $time = date("Y-m-d H:i:s");
+        $info = [
+            'openid' => $openid,
+            'name' => $name,
+            'time' => $time
+        ];
+        //发送
+        $templateRes = $template->registerMes($info);
+        if ($templateRes['errcode'] == 0) {//模板消息发送成功
+            $this->return_msg('0','信息注册成功');
+        } else {//模板消息失败
+            $this->return_msg('2','注册成功，但是由于微信服务器出现错误，你不会在公众号收到注册成功的消息，但是没有影响。');
+        }
+
+    }
 
     //绑定表单
     public function binding()
@@ -141,73 +108,52 @@ class User extends Base
         $openid = $user['openid'];
         $nickname = $user['nickname'];
 
+        //============ start =========
+        //验证表单token
         $valid = validate('Token');
         $res = $valid->check(['__token__' => $token]);
-
-        if ($res)//token验证成功
-        {
-            //先判断是否注册了信息
-            $user = UserInfo::get(['openid' => $openid]);
-            if ($user == null)//没有注册
-            {
-                //---------调接口----------
-                try {
-
-                    //处理接口返回信息
-                    //如果成功写入数据库，
-                    $newUser = new UserInfo;
-
-                    //接口成功时发送模板消息
-                    //实例化service类
-                    $template = \think\Loader::model('TemplateMes', 'service');
-                    //组装信息
-                    $time = date("Y-m-d H:i:s");
-                    $info = [
-                        'openid' => $openid,
-                        'name' => $nickname,//name要接口成功才可以获取
-                        'time' => $time
-                    ];
-                    //发送
-                    $templateRes = $template->bindMes($info);
-
-                    //组装返回给前端的信息
-                    if ($templateRes['errcode'] == 0) {//模板消息发送成功
-                        //设置返回信息
-                        $backInfo = [
-                            'errcode' => '0',
-                            'errmsg' => '请返回公众号继续其他操作，谢谢合作。'
-                        ];
-                    } else {//模板消息失败
-                        //设置返回信息
-                        $backInfo = [
-                            'errcode' => '0',
-                            'errmsg' => '但是由于微信服务器出现错误，你不会在公众号收到注册成功的消息，但是没有影响。'
-                        ];
-                    }
-
-                    //接口失败时
-
-                } catch (\Exception $e) {
-                    $date = date("Y-m-d h:i:s");//获取时间
-                    file_put_contents('./log/err/bind.txt', $date . ' ' . $openid . '绑定失败' . PHP_EOL, FILE_APPEND);
-                }
-            } else {//注册了
-                $backInfo = [
-                    'errcode' => '2',
-                    'errmsg' => '该微信已经绑定了信息，请不要重复绑定（目前一个微信号只能绑定一个账号）'
-                ];
-            }
-
-        } else {
-            $backInfo = [
-                'errcode' => '1',
-                'errmsg' => $valid->getError() . '请你重试'
-            ];
+        if(!$res){
+            $this->return_msg('1',$valid->getError());
         }
-        //给前端返回信息
-        return $backInfo;
+
+        //判断注册了信息
+        $user = UserInfo::get(['openid' => $openid]);
+        if(!empty($user)){
+            $this->return_msg('2','你已经注册过了(一个微信号只能注册一个账号)');
+        }
+
+        //=========掉门诊部接口==========
+        //=======接口错误，直接返回信息，推出=======
+        //=========接口成功，先获取接口返回数据，再向服务器写一份数据==========
+
+        //都成功后先用户微信发送消息
+        $this->send_bind_Msg($openid,$nickname);
+        //============ end ===========
+
     }
-    //预约挂号表单
+
+    //绑定成功后发送消息
+    public function send_bind_Msg($openid,$nickname)
+    {
+        //实例化service类
+        $template = model('TemplateMes', 'service');
+        //组装信息
+        $time = date("Y-m-d H:i:s");
+        $info = [
+            'openid' => $openid,
+            'name' => $nickname,//name要接口成功才可以获取
+            'time' => $time
+        ];
+        //发送
+        $templateRes = $template->bindMes($info);
+
+        //组装返回给前端的信息
+        if ($templateRes['errcode'] == 0) {//模板消息发送成功
+            $this->return_msg('0','信息绑定成功');
+        } else {//模板消息失败
+            $this->return_msg('3', '绑定成功，但是由于微信服务器出现错误，你不会在公众号收到注册成功的消息，但是没有影响。');
+        }
+    }
 
     //============缴费实现==========
     public function pay($openid)//进来就获取了
@@ -242,7 +188,7 @@ class User extends Base
             $weChatPay->set_mch_id(PAYID);
             $weChatPay->set_pay_key(PAYKEY);
             //开始请求获取jsParam
-            return $weChatPay->getJsParam($id,$body,$total_fee,$openid);
+            return $weChatPay->getJsParam($id, $body, $total_fee, $openid);
 
 //==============第一个方法========
 //            //组装数据
