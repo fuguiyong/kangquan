@@ -14,6 +14,7 @@ use app\weixin\exClass\weixin\WeAuthorize;//授权服务类
 
 class Base extends Controller
 {
+
     //用户自动登录
     public function login($url)
     {
@@ -45,7 +46,7 @@ class Base extends Controller
     }
 
     //返回信息函数
-    public function return_msg($errcode, $errmsg = '', $data = [])
+    public function return_msg($errcode, $errmsg = '', $data = null)
     {
         $backInfo = [
             'errcode' => $errcode,
@@ -55,6 +56,19 @@ class Base extends Controller
 
         echo json_encode($backInfo);
         die;
+    }
+
+    //产生6随机验证码的函数
+    public function randValidCode()
+    {
+        $str = '0123456789';
+        $validCode = '';
+        for ($i = 0; $i < 6; $i++) {
+
+            $validCode .= $str[mt_rand(0, 9)];
+        }
+        return $validCode;
+
     }
 
 }

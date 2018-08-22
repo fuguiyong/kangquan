@@ -171,13 +171,11 @@
         function validSuccess(data) {
 
             //获取返回信息
-            var code = data.code;
-            var msg = data.msg;
-            var validCode = data.validCode;
-            var telNumber = data.mobile;
+            var code = data.errcode;
+            var msg = data.errmsg;
 
             //判断是否验证码发送成功
-            if (code == "000000") {
+            if (code == "0") {
                 //按钮失效，防止用户重复点击
                 //获取时间对象
                 var btnDate = new Date();
@@ -190,16 +188,6 @@
                     expires: btnDate
                 }); //先设置cookie,失效时间
                 timekeeping();
-
-                //设置cookie储存验证码、手机号，设置失效失效为5分钟
-                var date = new Date();
-                date.setTime(date.getTime() + 5 * 60 * 1000); //只能这么写，5分钟
-                $.cookie("validCode", validCode, {
-                    expires: date
-                });
-                $.cookie("telNumber", telNumber, {
-                    expires: date
-                });
 
                 //显示信息
                 swal("", "获取验证码成功，有效时间5分钟，请尽快填写！", "success").catch(swal.noop);
@@ -278,29 +266,6 @@
         //提交前函数
         //表单提交前验证函数
         function showRequest() {
-            //判断验证码与手机号是否正确
-            var tel = $.trim($("#tel").val());
-            var validCode = $.trim($("#validText").val());
-
-            if (tel != $.trim($.cookie("telNumber"))) {
-                if ($.cookie("telNumber") == null) {
-                    swal("", "验证码已经过期了或没有获取", "error").catch(swal.noop);
-                } else {
-                    swal("", "手机号与获取验证码的手机号不一致", "error").catch(swal.noop);
-                }
-                return false;
-            }
-
-            if (validCode != $.trim($.cookie("validCode"))) {
-                if ($.cookie("validCode") == null) {
-                    swal("", "验证码已经过期了或没有获取", "error").catch(swal.noop);
-                } else {
-                    swal("", "验证码输入错误", "error").catch(swal.noop);
-                }
-
-                return false;
-            }
-
             return true;
         }
 

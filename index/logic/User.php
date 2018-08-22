@@ -100,7 +100,8 @@ class User extends Base
         //错误信息，返回前端
         //-----test-----
         //验证token
-        $tel = input('post.tel');
+        $tel = input('post.tel');//手机号
+        $valid_code = input('post.validText');//验证码
         $token = input('__token__');
 
         //获取用户授权信息
@@ -113,8 +114,11 @@ class User extends Base
         $valid = validate('Token');
         $res = $valid->check(['__token__' => $token]);
         if(!$res){
-            $this->return_msg('1',$valid->getError());
+            $this->return_msg('1',$valid->getError().'，请刷新页面');
         }
+
+        //验证手机与验证码
+        $this->check_valid_code('bind',$tel,$valid_code);
 
         //判断注册了信息
         $user = UserInfo::get(['openid' => $openid]);
@@ -131,6 +135,7 @@ class User extends Base
         //============ end ===========
 
     }
+
 
     //绑定成功后发送消息
     public function send_bind_Msg($openid,$nickname)
