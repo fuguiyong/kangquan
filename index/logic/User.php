@@ -136,7 +136,7 @@ class User extends Base
     public function send_bind_Msg($openid,$nickname)
     {
         //实例化service类
-        $template = \think\Loader::model('TemplateMes', 'service');
+        $template = model('TemplateMes', 'service');
         //组装信息
         $time = date("Y-m-d H:i:s");
         $info = [
