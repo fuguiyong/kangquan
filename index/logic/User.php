@@ -34,7 +34,7 @@ class User extends Base
         //验证token
         $valid = validate('Token');
         $res = $valid->check(['__token__' => $token]);
-        if (!res) {
+        if (!$res) {
             $this->return_msg('3', $valid->getError());
         }
 
