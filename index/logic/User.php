@@ -21,6 +21,7 @@ class User extends Base
         $name = input('post.name');
         $tel = input('post.tel');
         $age = input('post.age');
+        $valid_code = input('post.validText');//验证码
         $token = input('__token__');
 
         //获取用户授权信息
@@ -35,8 +36,11 @@ class User extends Base
         $valid = validate('Token');
         $res = $valid->check(['__token__' => $token]);
         if (!$res) {
-            $this->return_msg('3', $valid->getError());
+            $this->return_msg('3', $valid->getError().'，不要重复提交，请刷新页面');
         }
+
+        //验证手机与验证码
+        $this->check_valid_code('register',$tel,$valid_code);
 
         //判断是否注册过
         $user1 = UserInfo::get(['openid' => $openid]);
@@ -114,7 +118,7 @@ class User extends Base
         $valid = validate('Token');
         $res = $valid->check(['__token__' => $token]);
         if(!$res){
-            $this->return_msg('1',$valid->getError().'，请刷新页面');
+            $this->return_msg('1',$valid->getError().'不要重复提交，请刷新页面');
         }
 
         //验证手机与验证码
