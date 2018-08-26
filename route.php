@@ -33,6 +33,8 @@ Route::any('successNative$','index/Pay/successNative');//NATIVE支付回调地�
 Route::any('successAlipay$','index/Test1/alipay');//支付宝回调地址
 Route::any('returnAlipay$','index/Test1/returnUrl');//支付宝回调地址
 
+Route::any('apitest$','api/Test/test');//发送模板消息api
+
 //--------start-----------
 //--------------微信公众号配置------------
 Route::any('weixin/config$', 'weixin/index/index');//微信配置
