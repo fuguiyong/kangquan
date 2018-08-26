@@ -27,7 +27,7 @@ class Base extends Controller
         //验证时间错
         //$this->check_time($this->request->param('time'));
         //验证token
-        //$this->check_token($this->request->param());
+        $this->check_token($this->request->param());
         //返回过滤字段
         $this->filterParamArr = $this->filter_param($this->request->param());
     }
@@ -51,6 +51,7 @@ class Base extends Controller
     //验证token函数
     public function check_token($arr)
     {
+        dump($arr);die;
         //先判断是否存在token
         if (!isset($arr['token']) || empty($arr['token'])) {
             $this->return_msg('4003', '缺少token参数');
@@ -61,7 +62,9 @@ class Base extends Controller
         unset($arr['token']);
         foreach ($arr as $value) {
             if (is_array($value)) {
-                $value = implode($value);
+                $value = json_encode($value,JSON_UNESCAPED_UNICODE);
+                echo $value;
+                die;
             }
             $server_token .= md5($value);
         }
@@ -86,7 +89,7 @@ class Base extends Controller
     }
 
     //返回信息函数
-    public function return_msg($errcode, $errmsg = '', $data = [])
+    public function return_msg($errcode, $errmsg = '', $data = null)
     {
         $backInfo = [
             'errcode' => $errcode,
