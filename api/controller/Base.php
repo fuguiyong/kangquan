@@ -19,13 +19,10 @@ class Base extends Controller
 
     protected function _initialize()
     {
-
-        $this->request = Request::instance();
         //获取提交的数据
-//        $jsonData = file_get_contents('php://input');
-//        $this->paramArr = json_decode($jsonData, true);
+        $this->request = Request::instance();
         //验证时间错
-        //$this->check_time($this->request->param('time'));
+        $this->check_time($this->request->param('time'));
         //验证token
         $this->check_token($this->request->param());
         //返回过滤字段
@@ -51,7 +48,6 @@ class Base extends Controller
     //验证token函数
     public function check_token($arr)
     {
-        dump($arr);die;
         //先判断是否存在token
         if (!isset($arr['token']) || empty($arr['token'])) {
             $this->return_msg('4003', '缺少token参数');
@@ -63,8 +59,6 @@ class Base extends Controller
         foreach ($arr as $value) {
             if (is_array($value)) {
                 $value = json_encode($value,JSON_UNESCAPED_UNICODE);
-                echo $value;
-                die;
             }
             $server_token .= md5($value);
         }

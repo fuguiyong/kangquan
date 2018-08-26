@@ -32,22 +32,7 @@ class Scheduling extends Base
 
     }
 
-    //重新token验证规则
-    public function check_token($arr)
-    {
-        //先判断是否存在token
-        if (!isset($arr['token']) || empty($arr['token'])) {
-            $this->return_msg('4003', '缺少token参数');
-        }
-        //验证token
-        $client_token = $arr['token'];
-        //验证规则
-        $server_token = md5('kangquan' . md5($arr['time']) . 'kangquan');
 
-        if ($client_token !== $server_token) {
-            $this->return_msg('4004', 'token不正确');
-        }
-    }
 
     //重新过滤参数规则
     public function filter_param($arr)
