@@ -20,18 +20,35 @@ class Scheduling extends Base
 
         //获取验证成功，过滤后的参数
         $paramArr = $this->filterParamArr;//base类的属性
-        //想排班表插入数据
-        $sche = new SchedulingMod;
-        $res = $sche->allowField(true)->saveAll($paramArr);
-
-        if($res !== false){
-            $this->return_msg('0000','ok');
-        }else{
-            $this->return_msg('5001','排班表插入失败');
+        //判断每条插入信息是否再排班表有了,有就先删除
+        foreach ($paramArr as $value) {
+            $docter_id = $value['docter_id'];
+            $date = $value['date'];
+            $queryObj = SchedulingMod::get(['docter_id' => $docter_id, 'date' => $date]);
+            if (!empty($queryObj)) {
+                $delRes = $queryObj->delete();
+                if ($delRes === false) {
+                    $this->return_msg('5002', '数据库处理错误');
+                }
+            }
         }
-
+        //开始插入
+        $this->insert_info($paramArr);
     }
 
+    //插入信息
+    public function insert_info($arr)
+    {
+        //向排班表插入数据
+        $sche = new SchedulingMod;
+        $res = $sche->allowField(true)->saveAll($arr);
+
+        if ($res !== false) {
+            $this->return_msg('0000', 'ok');
+        } else {
+            $this->return_msg('5001', '排班表插入失败');
+        }
+    }
 
 
     //重新过滤参数规则

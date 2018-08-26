@@ -26,7 +26,7 @@ class Base extends Controller
         //验证token
         $this->check_token($this->request->param());
         //返回过滤字段
-        $this->filterParamArr = $this->filter_param($this->request->param());
+        $this->filterParamArr = $this->filter_param($this->request->except(['time','token']));
     }
 
     /*验证时间function
@@ -73,7 +73,6 @@ class Base extends Controller
     //过滤参数
     public function filter_param($arr)
     {
-        unset($arr['time'], $arr['token']);
         $validData = \think\Loader::validate('DataFilter');
         if (!$validData->check($arr)) {
             $this->return_msg('4005', $validData->getError());
