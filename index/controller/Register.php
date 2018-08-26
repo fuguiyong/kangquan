@@ -46,11 +46,6 @@ class Register extends Base
 
         }
 
-
-        //----------云之讯--------
-        // $sms = new smsyzm();
-        // //执行验证码的发送，并且返回前端json数据
-        // return $sms->sendValid();//返回给前端json数据
     }
 
 
