@@ -80,10 +80,12 @@ class Test1 extends Controller
 
     public function dayTest()
     {
-        $name = '付贵勇';
-        $sql = "select *from userinfo where username ='$name'";
-        $sql_res = Db::query($sql);
-        dump($sql_res);
+
+        echo phpinfo();
+//        $name = '付贵勇';
+//        $sql = "select *from userinfo where username ='$name'";
+//        $sql_res = Db::query($sql);
+//        dump($sql_res);
 
 
 //        //配置参数

@@ -154,7 +154,7 @@ class OrderLogic extends Base
             //判断医生该时间段是否有剩余
             $docterDay = @Cache::get($date_docter_id);
             $docterDayArr = @json_decode($docterDay, true);
-            if (@count($docterDayArr[$time]) < config('times_max')) {//有剩余
+            if (empty($docterDayArr[$time]) || @count($docterDayArr[$time]) < config('times_max')) {//有剩余
                 //开始预约
                 $backInfo = $this->startOrder($docter_id, $date, $time, $openid);
             } else {//没有剩余
@@ -427,7 +427,7 @@ class OrderLogic extends Base
             $docter = Cache::get($date_docter_id);
             $docterArr = json_decode($docter, true);
 
-            if (@count($docterArr[$nextInput]) < config('times_max')) {
+            if (empty($docterArr[$nextInput]) || @count($docterArr[$nextInput]) < config('times_max')) {
                 return true;
             } else {
                 return false;
