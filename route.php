@@ -24,6 +24,7 @@ Route::any('valid$', 'index/index/getValid');
 Route::any('indextest$', 'index/Order/formNav');
 Route::any('test3$', 'index/Test/payBackTest');
 Route::any('test2$', 'index/Test1/dayTest');
+Route::any('loginNative$', 'index/Test1/dayTest2');
 Route::any('infotest$', 'api/Test/sendUserInfo');//接口路由
 Route::any('api$', 'index/Test1/payTbTest');//测试接口
 Route::any('service$', 'index/Test/template');//客服接口接口
