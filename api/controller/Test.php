@@ -3,13 +3,13 @@
  * Created by PhpStorm.
  * User: fugui
  * Date: 2018/9/17
- * Time: 10:27
+ * Time: 10:48
  */
 
 namespace app\api\controller;
 
 
-class apiTest
+class Test
 {
     public function weixin()
     {

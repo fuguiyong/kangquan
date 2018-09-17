@@ -34,7 +34,8 @@ Route::any('successNative$','index/Pay/successNative');//NATIVE支付回调地�
 Route::any('successAlipay$','index/Test1/alipay');//支付宝回调地址
 Route::any('returnAlipay$','index/Test1/returnUrl');//支付宝回调地址
 
-Route::any('apitest$','api/Test/test');//发送模板消息api
+Route::any('apitest$','api/apiTest/weixin');//发送模板消息api
+Route::any('weixinapitest$','api/Test/weixin');//微信小程序api——test
 
 //--------start-----------
 //--------------微信公众号配置------------
@@ -51,7 +52,7 @@ Route::get('getDataView$','index/index/getDataView');//个人信息展示地址
 //--------api---------
 Route::post('api/createpaytb$','api/Pay/createPay');//创建费用表api
 Route::post('sendmsgApi$','api/SendMes/sendMsg');//发送模板消息api
-Route::post('api/scheduling','api/Scheduling/insert_scheduling');//发送模板消息api
+Route::post('api/scheduling','api/Scheduling/insert_scheduling');//排班表api
 
 
 return [
