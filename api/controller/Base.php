@@ -90,7 +90,7 @@ class Base extends Controller
             'data' => $data
         ];
 
-        echo json_encode($backInfo);
+        echo json_encode($backInfo,JSON_UNESCAPED_UNICODE);
         die;
     }
 
